@@ -1,16 +1,30 @@
-var http = require("http");
-var express = require ("express");
+// Module dependencies.
+
+var express = require('express')
+  , routes = require('./routes')
+  , http = require('http')
+  , path = require('path');
 
 // Create the express application
 var app = express();
 
 // Configure express
 app.configure(function(){
-	app.use(express.logger());  // Turn on Apache style logging (pass thru from Connect)
-	app.use(express.errorHandler());
-	app.use(express.static(__dirname + '/static'));
-	app.set('views', __dirname + '/views');
-	app.set('view engine', 'jade');  //Set the default view engine.
+  app.set('port', process.env.PORT || 4000);
+  app.set('title', 'Tariff Compare');
+  app.set('views', __dirname + '/views');
+  //app.set('view engine', 'ejs');  //Set the default view engine.
+  app.set('view engine', 'jade');  //Set the default view engine.
+  app.use(express.favicon());
+  app.use(express.logger('dev'));    // Turn on Apache style logging (pass thru from Connect)
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(express.cookieParser('your secret here'));
+  app.use(express.session());
+  app.use(app.router);
+  app.use(require('stylus').middleware(__dirname + '/public'));
+  app.use(express.static(path.join(__dirname, 'public')));
+  app.use(express.errorHandler());
 });
 
 // Uses environmental variables (e.g. "NODE_ENV=development node app.js") passed into the command line 
@@ -20,10 +34,12 @@ app.configure('development', function(){
   app.use(express.errorHandler({dumpExceptions: true, showStack: true}));  //Dump exceptions and show the stack in the browser.
 });
 
-// Routing
-app.get('/', function(req, res){
-	//res.send('Hello world!');
-	res.render('root');
+// Routing (ejs)
+//app.get('/', routes.index);
+
+// Routing (jade)
+app.get('/', function(req, res, next){
+  res.render('root');
 });
 
 
@@ -40,6 +56,8 @@ http.get("http://api.genability.com/rest/public/lses?appId=9a43a58bDD&appKey=38e
   console.log("Got error: " + e.message);
 });
 
-// Listen for requests
+// Create the server and listen for requests
 
-app.listen(4000);
+http.createServer(app).listen(app.get('port'), function(){
+  console.log("Express server listening on port " + app.get('port'));
+});
