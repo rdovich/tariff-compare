@@ -1,0 +1,17 @@
+{
+  "name": "TariffCompare",
+  "version": "0.0.0",
+  "description": "Allows a user to compare their current electric tariff with others that are available to determine if they are using the most appropriate one.",
+  "main": "app.js",
+  "dependencies": {
+    "express": "~3.0.0rc2",
+    "jade": "~0.27.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "Ron Dovich",
+  "license": "BSD"
+}
