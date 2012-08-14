@@ -7,11 +7,13 @@ var express = require('express')
 
 // Create the express application
 var app = express();
+var utilities = [];
+var zipcode = '';
 
 // Configure express
 app.configure(function(){
   app.set('port', process.env.PORT || 4000);
-  app.set('title', 'Tariff Compare');
+  app.set('title', 'Tariffes Compare');
   app.set('views', __dirname + '/views');
   //app.set('view engine', 'ejs');  //Set the default view engine.
   app.set('view engine', 'jade');  //Set the default view engine.
@@ -27,6 +29,29 @@ app.configure(function(){
   app.use(express.errorHandler());
 });
 
+
+
+// Call Genability and get the data.
+
+  http.get("http://api.genability.com/rest/public/lses?appId=9a43a58bDD&appKey=38e0a19462aabf1e27cafee5368d547c&zipCode=78641", function(res) {
+    console.log("Got response: " + res.statusCode);
+    //console.log('HEADERS: ' + JSON.stringify(res.headers));
+    res.setEncoding('utf8');
+    res.on('data', function (chunk) {
+      //console.log('BODY: ' + chunk);
+      lses = JSON.parse(chunk);
+      if (lses.status = 'success') {
+  	   for (i=0; i<lses.results.length; i++) {
+  		    console.log(lses.results[i].name);
+  		    utilities.push(lses.results[i].name);
+  	    }
+      }
+    });
+  }).on('error', function(e) {
+    console.log("Got error: " + e.message);
+  });
+
+
 // Uses environmental variables (e.g. "NODE_ENV=development node app.js") passed into the command line 
 // to tell express how to handle exceptions.
 
@@ -39,21 +64,13 @@ app.configure('development', function(){
 
 // Routing (jade)
 app.get('/', function(req, res, next){
-  res.render('root');
+  res.render('root', {Title: 'Tariff Compare'});
 });
 
+app.post('/utilities', function(req, res, next){
 
-// Call Genability and get the data.
-
-http.get("http://api.genability.com/rest/public/lses?appId=9a43a58bDD&appKey=38e0a19462aabf1e27cafee5368d547c&zipCode=78641", function(res) {
-  console.log("Got response: " + res.statusCode);
-  console.log('HEADERS: ' + JSON.stringify(res.headers));
-  res.setEncoding('utf8');
-  res.on('data', function (chunk) {
-    console.log('BODY: ' + chunk);
-  });  
-}).on('error', function(e) {
-  console.log("Got error: " + e.message);
+  console.log(req.Body.zipcode);
+  res.render('utilities', {Title: 'Tariff Compare',zip: zipcode, utilities: utilities});
 });
 
 // Create the server and listen for requests
