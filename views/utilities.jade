@@ -1,0 +1,7 @@
+extends layout
+
+block content
+  label #{utilities.length} Utilities for #{zip}:
+    select(name='util_list')
+      for name in utilities
+        option #{name}
