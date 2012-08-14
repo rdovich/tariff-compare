@@ -7,7 +7,9 @@
     "express": "~3.0.0rc2",
     "jade": "~0.27.2",
     "ejs": "*",
-    "stylus": "*"
+    "stylus": "*",
+    "q": "~0.8.6",
+    "request": "~2.10.0"
   },
   "devDependencies": {},
   "scripts": {
