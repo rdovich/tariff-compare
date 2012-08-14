@@ -1,5 +1,9 @@
 extends layout
 
 block content
-  h2 Hello
-  p World!
+  h2 Edit Document
+  form(method='post', action='/utilities')
+    div
+      label Zipcode:
+        input(type='text', name='zipcode')
+        input(type='submit', value='Get Utilities')
