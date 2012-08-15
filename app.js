@@ -3,17 +3,19 @@
 var express = require('express')
   , routes = require('./routes')
   , http = require('http')
-  , path = require('path');
+  , path = require('path')
+  , Q = require('q')
+  , querystring = require('querystring')
+  , request = require('request');
 
 // Create the express application
 var app = express();
-var utilities = [];
 var zipcode = '';
 
 // Configure express
 app.configure(function(){
   app.set('port', process.env.PORT || 4000);
-  app.set('title', 'Tariffes Compare');
+  app.set('title', 'Tariff Details');
   app.set('views', __dirname + '/views');
   //app.set('view engine', 'ejs');  //Set the default view engine.
   app.set('view engine', 'jade');  //Set the default view engine.
@@ -30,26 +32,65 @@ app.configure(function(){
 });
 
 
+var appId = '9a43a58bDD';
+var appKey = '38e0a19462aabf1e27cafee5368d547c';
+var zipCode = '';
+
 
 // Call Genability and get the data.
+  
+function getGenabilityUtilities(appId, appKey, zipcode) {
 
-  http.get("http://api.genability.com/rest/public/lses?appId=9a43a58bDD&appKey=38e0a19462aabf1e27cafee5368d547c&zipCode=78641", function(res) {
-    console.log("Got response: " + res.statusCode);
-    //console.log('HEADERS: ' + JSON.stringify(res.headers));
-    res.setEncoding('utf8');
-    res.on('data', function (chunk) {
-      //console.log('BODY: ' + chunk);
-      lses = JSON.parse(chunk);
-      if (lses.status = 'success') {
-  	   for (i=0; i<lses.results.length; i++) {
-  		    console.log(lses.results[i].name);
-  		    utilities.push(lses.results[i].name);
-  	    }
+  var deferred = Q.defer();
+  var parms = {appId: appId, appKey: appKey, zipCode: zipcode};
+  var url = "http://api.genability.com/rest/public/lses?" + querystring.stringify(parms); 
+  
+  request ({url: url},
+    function (error, resp, respJSON) {
+      try {
+        var respObj = JSON.parse(respJSON);
+      } catch (e) {
+        deferred.revoke('server error');
+        return;
       }
-    });
-  }).on('error', function(e) {
-    console.log("Got error: " + e.message);
+      
+      if (!error && (resp.statusCode == 200)) {
+        deferred.resolve(respObj.results);
+      } else {
+        deferred.reject('error');
+      }
   });
+  return deferred.promise;
+};
+
+
+function getGenabilityTariffs(appId, appKey, zipcode) {
+
+//rest/public/tariffs?appId=xxx&appKey=yyy&zipCode=94115&populateProperties=true&customerClasses=RESIDENTIAL
+
+
+  var deferred = Q.defer();
+  var parms = {appId: appId, appKey: appKey, zipCode: zipcode, populateProperties: 'true', customerClasses: 'GENERAL'};
+  var url = "http://api.genability.com/rest/public/tariffs?" + querystring.stringify(parms);
+  console.log("URL: " , url); 
+  
+  request ({url: url},
+    function (error, resp, respJSON) {
+      try {
+        var respObj = JSON.parse(respJSON);
+      } catch (e) {
+        deferred.revoke('server error');
+        return;
+      }
+      
+      if (!error && (resp.statusCode == 200)) {
+        deferred.resolve(respObj.results);
+      } else {
+        deferred.reject('error');
+      }
+  });
+  return deferred.promise;
+};
 
 
 // Uses environmental variables (e.g. "NODE_ENV=development node app.js") passed into the command line 
@@ -64,14 +105,23 @@ app.configure('development', function(){
 
 // Routing (jade)
 app.get('/', function(req, res, next){
-  res.render('root', {Title: 'Tariff Compare'});
+  res.render('root', {Title: 'Tariff Details'});
 });
 
-app.post('/utilities', function(req, res, next){
-
-  console.log(req.Body.zipcode);
-  res.render('utilities', {Title: 'Tariff Compare',zip: zipcode, utilities: utilities});
+app.post('/display-utilities', function(req, res, next){
+  zipcode = req.body.zipcode;
+  getGenabilityUtilities(appId, appKey, zipcode).then(function(utilities) {
+	res.render('utilities', {Title: 'Tariff Details',zip: req.body.zipcode, utilities: utilities});
+  });
 });
+
+app.post('/display-tariffs', function(req, res, next){
+  getGenabilityTariffs(appId, appKey, zipcode).then(function(utilities) {
+    console.log(req.body);
+	res.render('utilities', {Title: 'Tariff Details',zip: req.body.zipcode, utilities: utilities});
+  });
+});
+
 
 // Create the server and listen for requests
 
