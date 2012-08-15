@@ -2,6 +2,7 @@ extends layout
 
 block content
   div.span12
+    h2 #{Subtitle}
     form.well.form-inline(method='post', action='/display-utilities')
       input.input-medium(type='text', name='zipcode', placeholder='Enter your zipcode')
       button.btn(type='submit').
