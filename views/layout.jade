@@ -2,8 +2,15 @@
 html
   head
     link(rel='stylesheet', href='/stylesheets/styles.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap-responsive.css')
+    //script(src='/javascripts/bootstrap.js')
     title #{Title}
   body
-    #main
-      h1 #{Title}
-      block content
+    div.container
+      header.jumbotron.subhead
+        h1 #{Title}
+        p.lead.
+          This tool allows you to view the details of different tariffs in a specific location. 
+      div.row
+        block content
