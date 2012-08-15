@@ -35,6 +35,7 @@ var appId = '9a43a58bDD';
 var appKey = '38e0a19462aabf1e27cafee5368d547c';
 var zipCode = '';
 var utilityList;
+var tariffList;
 var lseId = '';
 var utilityName = '';
 
@@ -48,12 +49,19 @@ function getGenabilityUtilities(appId, appKey, zipcode) {
   return url;
 };
 
-
 function getGenabilityTariffs(appId, appKey, lseId) {
 
   var parms = {appId: appId, appKey: appKey, lseId: lseId, populateProperties: 'true', customerClasses: 'GENERAL'};
   var url = "http://api.genability.com/rest/public/tariffs?" + querystring.stringify(parms); 
   
+  return url;
+};
+
+function getGenabilityTariff(appId, appKey, tariffId) {
+
+  var parms = {appId: appId, appKey: appKey};
+  var url = "http://api.genability.com/rest/public/tariffs/" + tariffId + "?" + querystring.stringify(parms); 
+  console.log(url);
   return url;
 };
 
@@ -98,18 +106,39 @@ app.post('/display-utilities', function(req, res, next){
 });
 
 app.post('/display-tariffs', function(req, res, next){
+  console.log(req.body);
   for (i=0; i<utilityList.length; i++) {
-    if (utilityList[i].name === req.body.util_list) {
+    if (utilityList[i].name === req.body.selectedUtil) {
       lseId = utilityList[i].lseId;
-      utilityName = req.body.util_list;
     }
   }
-  console.log('lseId: ', lseId);
+
+  utilityName = req.body.selectedUtil;
+      
   getGenabilityData(getGenabilityTariffs(appId, appKey, lseId)).then(function(tariffs) {
+	tariffList = tariffs;
 	res.render('tariffs', {Title: 'Tariff Details', Subtitle: 'Select your tariff', zip: zipcode, tariffs: tariffs, utilityName: utilityName});
   });
 });
 
+app.post('/display-tariff-details', function(req, res, next){
+  console.log(req.body);
+  console.log(tariffList);
+  console.log(tariffList.length);
+
+  for (i=0; i<tariffList.length; i++) {
+    if (tariffList[i].tariffName === req.body.selectedTariff) {
+      tariffId = tariffList[i].tariffId;
+    }
+  }
+  
+  tariffName = req.body.selectedTariff;
+  
+  getGenabilityData(getGenabilityTariff(appId, appKey, tariffId)).then(function(tariff) {
+    console.log(tariff[0]);
+    res.render('tariff', {Title: 'Tariff Details', Subtitle: 'Tariff detail for ' + utilityName + ': ' + tariffName, tariff: tariff[0]});
+  });
+});
 
 // Create the server and listen for requests
 
