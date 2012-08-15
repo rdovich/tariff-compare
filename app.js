@@ -17,7 +17,6 @@ app.configure(function(){
   app.set('port', process.env.PORT || 4000);
   app.set('title', 'Tariff Details');
   app.set('views', __dirname + '/views');
-  //app.set('view engine', 'ejs');  //Set the default view engine.
   app.set('view engine', 'jade');  //Set the default view engine.
   app.use(express.favicon());
   app.use(express.logger('dev'));    // Turn on Apache style logging (pass thru from Connect)
@@ -35,44 +34,31 @@ app.configure(function(){
 var appId = '9a43a58bDD';
 var appKey = '38e0a19462aabf1e27cafee5368d547c';
 var zipCode = '';
-
+var utilityList;
+var lseId = '';
+var utilityName = '';
 
 // Call Genability and get the data.
   
 function getGenabilityUtilities(appId, appKey, zipcode) {
 
-  var deferred = Q.defer();
   var parms = {appId: appId, appKey: appKey, zipCode: zipcode};
-  var url = "http://api.genability.com/rest/public/lses?" + querystring.stringify(parms); 
-  
-  request ({url: url},
-    function (error, resp, respJSON) {
-      try {
-        var respObj = JSON.parse(respJSON);
-      } catch (e) {
-        deferred.revoke('server error');
-        return;
-      }
-      
-      if (!error && (resp.statusCode == 200)) {
-        deferred.resolve(respObj.results);
-      } else {
-        deferred.reject('error');
-      }
-  });
-  return deferred.promise;
+  var url = "http://api.genability.com/rest/public/lses?" + querystring.stringify(parms);
+
+  return url;
 };
 
 
-function getGenabilityTariffs(appId, appKey, zipcode) {
+function getGenabilityTariffs(appId, appKey, lseId) {
 
-//rest/public/tariffs?appId=xxx&appKey=yyy&zipCode=94115&populateProperties=true&customerClasses=RESIDENTIAL
+  var parms = {appId: appId, appKey: appKey, lseId: lseId, populateProperties: 'true', customerClasses: 'GENERAL'};
+  var url = "http://api.genability.com/rest/public/tariffs?" + querystring.stringify(parms); 
+  
+  return url;
+};
 
-
+function getGenabilityData(url) {
   var deferred = Q.defer();
-  var parms = {appId: appId, appKey: appKey, zipCode: zipcode, populateProperties: 'true', customerClasses: 'GENERAL'};
-  var url = "http://api.genability.com/rest/public/tariffs?" + querystring.stringify(parms);
-  console.log("URL: " , url); 
   
   request ({url: url},
     function (error, resp, respJSON) {
@@ -81,8 +67,7 @@ function getGenabilityTariffs(appId, appKey, zipcode) {
       } catch (e) {
         deferred.revoke('server error');
         return;
-      }
-      
+      }      
       if (!error && (resp.statusCode == 200)) {
         deferred.resolve(respObj.results);
       } else {
@@ -90,8 +75,7 @@ function getGenabilityTariffs(appId, appKey, zipcode) {
       }
   });
   return deferred.promise;
-};
-
+}
 
 // Uses environmental variables (e.g. "NODE_ENV=development node app.js") passed into the command line 
 // to tell express how to handle exceptions.
@@ -100,25 +84,29 @@ app.configure('development', function(){
   app.use(express.errorHandler({dumpExceptions: true, showStack: true}));  //Dump exceptions and show the stack in the browser.
 });
 
-// Routing (ejs)
-//app.get('/', routes.index);
-
 // Routing (jade)
 app.get('/', function(req, res, next){
-  res.render('root', {Title: 'Tariff Details'});
+  res.render('root', {Title: 'Tariff Details', Subtitle: 'Enter your zipcode'});
 });
 
 app.post('/display-utilities', function(req, res, next){
   zipcode = req.body.zipcode;
-  getGenabilityUtilities(appId, appKey, zipcode).then(function(utilities) {
-	res.render('utilities', {Title: 'Tariff Details',zip: req.body.zipcode, utilities: utilities});
+  getGenabilityData(getGenabilityUtilities(appId, appKey, zipcode)).then(function(utilities) {
+	utilityList = utilities;
+	res.render('utilities', {Title: 'Tariff Details', Subtitle: 'Select your utility', zip: zipcode, utilities: utilities});
   });
 });
 
 app.post('/display-tariffs', function(req, res, next){
-  getGenabilityTariffs(appId, appKey, zipcode).then(function(utilities) {
-    console.log(req.body);
-	res.render('utilities', {Title: 'Tariff Details',zip: req.body.zipcode, utilities: utilities});
+  for (i=0; i<utilityList.length; i++) {
+    if (utilityList[i].name === req.body.util_list) {
+      lseId = utilityList[i].lseId;
+      utilityName = req.body.util_list;
+    }
+  }
+  console.log('lseId: ', lseId);
+  getGenabilityData(getGenabilityTariffs(appId, appKey, lseId)).then(function(tariffs) {
+	res.render('tariffs', {Title: 'Tariff Details', Subtitle: 'Select your tariff', zip: zipcode, tariffs: tariffs, utilityName: utilityName});
   });
 });
 
