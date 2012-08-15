@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  div.span12
+    h3 #{Subtitle}
+    div.span8.well
+      dl.dl-horizontal
+        each val, key in tariff
+          dt #{key}:
+          - if (val == '' || val == null) 
+            dd None
+          - else
+            dd #{val}
