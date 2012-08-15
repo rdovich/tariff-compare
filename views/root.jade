@@ -1,9 +1,8 @@
 extends layout
 
 block content
-  h2 Edit Document
-  form(method='post', action='/utilities')
-    div
-      label Zipcode:
-        input(type='text', name='zipcode')
-        input(type='submit', value='Get Utilities')
+  div.span12
+    form.well.form-inline(method='post', action='/display-utilities')
+      input.input-medium(type='text', name='zipcode', placeholder='Enter your zipcode')
+      button.btn(type='submit').
+        Get Utilities
