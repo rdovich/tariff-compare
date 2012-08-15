@@ -5,7 +5,7 @@ block content
     h2 #{Subtitle}
     form.well.form-inline(method='post', action='/display-tariffs')
       label Select your utilities for #{zip}:
-      select(name='util_list')
+      select(name='selectedUtil')
         for utility in utilities
           option #{utility.name}
       button.btn(type='submit').
