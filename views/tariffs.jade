@@ -3,10 +3,10 @@ extends layout
 block content
   div.span12
     h2 #{Subtitle}
-    form.well.form-inline(method='post', action='/display-tariffs')
+    form.well.form-inline(method='post', action='/display-tariff-details')
       label Select your tariff for #{utilityName}:
-      select(name='tariff_list')
+      select(name='selectedTariff')
         for tariff in tariffs
           option #{tariff.tariffName}
       button.btn(type='submit').
-        Get Next Thing
+        Get Details
