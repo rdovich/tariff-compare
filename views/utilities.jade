@@ -1,7 +1,11 @@
 extends layout
 
 block content
-  label #{utilities.length} Utilities for #{zip}:
-    select(name='util_list')
-      for name in utilities
-        option #{name}
+  div.span12
+    form.well.form-inline(method='post', action='/display-tariffs')
+      label Select your utilities for #{zip}:
+      select(name='util_list')
+        for utility in utilities
+          option #{utility.name}
+      button.btn(type='submit').
+        Get Tariffs
