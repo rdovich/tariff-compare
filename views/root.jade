@@ -1,12 +1,11 @@
 extends layout
 
 block content
-  div.span12
-    h2 #{Subtitle}
-    form.well.form-inline(method='post', action='/display-utilities')
-      div
-        input.input-medium(type='text', name='zipcode', placeholder='Enter your zipcode')
-        //- the following is required to put a space between form elements for Safari
-        | 
-        button.btn.btn-primary(type='submit').
-          Get Utilities
+  h2 #{Subtitle}
+  form.well.form-inline(method='post', action='/display-utilities')
+    div
+      input.input-medium(type='text', name='zipcode', placeholder='Enter your zipcode')
+      //- the following is required to put a space between form elements for Safari
+      | 
+      button.btn.btn-primary(type='submit').
+        Get Utilities
