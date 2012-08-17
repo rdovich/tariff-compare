@@ -3,11 +3,25 @@ extends layout
 block content
   div.span12
     h3 #{Subtitle}
-    div.span8.well
-      dl.dl-horizontal
+    div.span8
+      table.table.table-striped.table-bordered.table-condensed
+        thead
+          tr
+            th Attribute
+            th Value
+        tbody
         each val, key in tariff
-          dt #{key}:
-          - if (val == '' || val == null) 
-            dd None
-          - else
-            dd #{val}
+          tr
+            td #{key}:
+            - if (val == '' || val == null) 
+              td None
+            - else
+              td #{val}
+    div.row
+      div.span12
+        p
+    div.row
+      div.span12
+        p Click 
+          a(href='/') here 
+          to start over.
