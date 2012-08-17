@@ -5,8 +5,20 @@ block content
     h2 #{Subtitle}
     form.well.form-inline(method='post', action='/display-tariff-details')
       label Select your tariff for #{utilityName}:
+      //- the following is required to put a space between form elements for Safari
+      | 
       select(name='selectedTariff')
         for tariff in tariffs
           option #{tariff.tariffName}
-      button.btn(type='submit').
+      //- the following is required to put a space between form elements for Safari
+      | 
+      button.btn.btn-primary(type='submit').
         Get Details
+    div.row
+      div.span12
+        p
+    div.row
+      div.span12
+        p Click 
+          a(href='/') here 
+          to start over.
