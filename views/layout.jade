@@ -9,6 +9,16 @@ html(lang='en')
         padding-top: 60px;
         padding-bottom: 40px;
       }
+      a.genability {
+        text: decoration: none;
+        display: inline-block;
+        width: 160px;
+        height: 32px;
+        overflow: hidden;
+        text-align: left;
+        text-indent: -9999px;
+        background: url(http://genability.com/images/powered-by/poweredby_genability-160.png) no-repeat;
+      }
     title #{Title}
   body
     div.container
@@ -25,3 +35,7 @@ html(lang='en')
             a(href='/') here 
             to start over.
           p &copy; Noesis Energy Inc.
+      div.span1.offset5
+        div.row
+          p
+            a.genability(href="http://www.genability.com/") Powered by Genability
