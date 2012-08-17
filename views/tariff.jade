@@ -1,27 +1,17 @@
 extends layout
 
 block content
-  div.span12
-    h3 #{Subtitle}
-    div.span8
-      table.table.table-striped.table-bordered.table-condensed
-        thead
-          tr
-            th Attribute
-            th Value
-        tbody
-        each val, key in tariff
-          tr
-            td #{key}:
-            - if (val == '' || val == null) 
-              td None
-            - else
-              td #{val}
-    div.row
-      div.span12
-        p
-    div.row
-      div.span12
-        p Click 
-          a(href='/') here 
-          to start over.
+  h3 #{Subtitle}
+  table.table.table-striped.table-bordered.table-condensed
+    thead
+      tr
+        th Attribute
+        th Value
+    tbody
+    each val, key in tariff
+      tr
+        td #{key}:
+        - if (val == '' || val == null) 
+          td None
+        - else
+          td #{val}
