@@ -5,7 +5,8 @@ var express = require('express')
   , path = require('path')
   , Q = require('q')
   , querystring = require('querystring')
-  , request = require('request');
+  , request = require('request')
+  , stylus = require('stylus');
 
 // Create the express application
 var app = express();
@@ -31,7 +32,7 @@ app.configure(function(){
   app.use(express.cookieParser('your secret here'));
   app.use(express.session());
   app.use(app.router);
-  app.use(require('stylus').middleware(__dirname + '/public'));
+  app.use(stylus.middleware(__dirname + '/public'));
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(express.errorHandler());
 });
