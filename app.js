@@ -1,7 +1,6 @@
 // Module dependencies.
 
 var express = require('express')
-  , routes = require('./routes')
   , http = require('http')
   , path = require('path')
   , Q = require('q')
@@ -10,7 +9,14 @@ var express = require('express')
 
 // Create the express application
 var app = express();
+var appId = '9a43a58bDD';
+var appKey = '38e0a19462aabf1e27cafee5368d547c';
 var zipcode = '';
+var utilityList;
+var tariffList;
+var lseId = '';
+var tariffId = '';
+var utilityName = '';
 
 // Configure express
 app.configure(function(){
@@ -30,38 +36,30 @@ app.configure(function(){
   app.use(express.errorHandler());
 });
 
+// Uses environmental variables (e.g. "NODE_ENV=development node app.js") passed into the command line 
+// to tell express how to handle exceptions.
 
-var appId = '9a43a58bDD';
-var appKey = '38e0a19462aabf1e27cafee5368d547c';
-var zipCode = '';
-var utilityList;
-var tariffList;
-var lseId = '';
-var utilityName = '';
+app.configure('development', function(){
+  app.use(express.errorHandler({dumpExceptions: true, showStack: true}));  //Dump exceptions and show the stack in the browser.
+});
 
 // Call Genability and get the data.
   
 function getGenabilityUtilities(appId, appKey, zipcode) {
-
   var parms = {appId: appId, appKey: appKey, zipCode: zipcode};
   var url = "http://api.genability.com/rest/public/lses?" + querystring.stringify(parms);
-
   return url;
 };
 
 function getGenabilityTariffs(appId, appKey, lseId) {
-
   var parms = {appId: appId, appKey: appKey, lseId: lseId, populateProperties: 'true', customerClasses: 'GENERAL'};
   var url = "http://api.genability.com/rest/public/tariffs?" + querystring.stringify(parms); 
-  
   return url;
 };
 
 function getGenabilityTariff(appId, appKey, tariffId) {
-
   var parms = {appId: appId, appKey: appKey};
   var url = "http://api.genability.com/rest/public/tariffs/" + tariffId + "?" + querystring.stringify(parms); 
-  console.log(url);
   return url;
 };
 
@@ -85,13 +83,6 @@ function getGenabilityData(url) {
   return deferred.promise;
 }
 
-// Uses environmental variables (e.g. "NODE_ENV=development node app.js") passed into the command line 
-// to tell express how to handle exceptions.
-
-app.configure('development', function(){
-  app.use(express.errorHandler({dumpExceptions: true, showStack: true}));  //Dump exceptions and show the stack in the browser.
-});
-
 // Routing (jade)
 app.get('/', function(req, res, next){
   res.render('root', {Title: 'Tariff Details', Subtitle: 'Enter your zipcode'});
@@ -106,7 +97,7 @@ app.post('/display-utilities', function(req, res, next){
 });
 
 app.post('/display-tariffs', function(req, res, next){
-  console.log(req.body);
+  //console.log(req.body);
   for (i=0; i<utilityList.length; i++) {
     if (utilityList[i].name === req.body.selectedUtil) {
       lseId = utilityList[i].lseId;
@@ -122,10 +113,7 @@ app.post('/display-tariffs', function(req, res, next){
 });
 
 app.post('/display-tariff-details', function(req, res, next){
-  console.log(req.body);
-  console.log(tariffList);
-  console.log(tariffList.length);
-
+  //console.log(req.body);
   for (i=0; i<tariffList.length; i++) {
     if (tariffList[i].tariffName === req.body.selectedTariff) {
       tariffId = tariffList[i].tariffId;
@@ -135,7 +123,6 @@ app.post('/display-tariff-details', function(req, res, next){
   tariffName = req.body.selectedTariff;
   
   getGenabilityData(getGenabilityTariff(appId, appKey, tariffId)).then(function(tariff) {
-    console.log(tariff[0]);
     res.render('tariff', {Title: 'Tariff Details', Subtitle: 'Tariff detail for ' + utilityName + ': ' + tariffName, tariff: tariff[0]});
   });
 });
