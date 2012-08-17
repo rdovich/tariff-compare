@@ -12,9 +12,16 @@ html(lang='en')
     title #{Title}
   body
     div.container
-      header.jumbotron.subhead
-      h1 #{Title}
-      p.lead.
-        This tool allows you to view the details of different tariffs in a zipcode. 
-      div.row
-        block content
+      div.span10.offset1
+        header.jumbotron.subhead
+          img.pull-right(src='/images/Logo-SM-200px.png')
+          h1 #{Title}
+          p.lead.
+            This tool allows you to view the details of different tariffs in a zipcode. 
+        div.row
+        block content 
+        footer.footer
+          p.pull-right Click 
+            a(href='/') here 
+            to start over.
+          p &copy; Noesis Energy Inc.
