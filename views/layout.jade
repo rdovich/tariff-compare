@@ -1,24 +1,20 @@
 !!! 5
-html
+html(lang='en')
   head
-    link(rel='stylesheet', href='/stylesheets/styles.css')
+    meta(charset='utf-8')
     link(rel='stylesheet', href='/stylesheets/bootstrap.css')
     link(rel='stylesheet', href='/stylesheets/bootstrap-responsive.css')
-    //script(src='/javascripts/bootstrap.js')
+    style(type="text/css")
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
     title #{Title}
   body
     div.container
       header.jumbotron.subhead
-        h1 #{Title}
-        p.lead.
-          This tool allows you to view the details of different tariffs in a zipcode. 
+      h1 #{Title}
+      p.lead.
+        This tool allows you to view the details of different tariffs in a zipcode. 
       div.row
         block content
-      div.row
-        div.span12
-          p
-      div.row
-        div.span12
-          p Click 
-            a(href='/') here 
-            to start over.
